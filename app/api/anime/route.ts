@@ -9,6 +9,19 @@ function matches(anime: Anime, genre: string | null, type: string | null) {
     (!type || type === 'All types' || anime.type.toLowerCase() === type.toLowerCase());
 }
 
+function sortCatalog(items: Anime[], section: string) {
+  return [...items].sort((a, b) => {
+    if (section === 'upcoming') {
+      const aDate = a.startDate || '9999-12-31';
+      const bDate = b.startDate || '9999-12-31';
+      return aDate.localeCompare(bDate) || (b.score || 0) - (a.score || 0);
+    }
+    const aDate = a.startDate || '0000-01-01';
+    const bDate = b.startDate || '0000-01-01';
+    return bDate.localeCompare(aDate) || (b.score || 0) - (a.score || 0);
+  });
+}
+
 function response(items: Anime[], page: number, perPage: number, source: string, stale = false) {
   const start = (page - 1) * perPage;
   const data = items.slice(start, start + perPage);
@@ -33,7 +46,7 @@ export async function GET(request: Request) {
 
     const catalog = await getCatalog();
     let items = section === 'upcoming' ? catalog.upcoming : catalog.latest;
-    items = items.filter((anime) => matches(anime, genre, type));
+    items = sortCatalog(items.filter((anime) => matches(anime, genre, type)), section);
     return response(items, page, perPage, catalog.source, catalog.stale);
   } catch (error) {
     console.error('Anime catalog failed:', error);
