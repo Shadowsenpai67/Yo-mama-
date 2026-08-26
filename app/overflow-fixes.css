@@ -1,0 +1,16 @@
+/* Layout safety fixes: keep catalog cards inside the viewport at every breakpoint. */
+html,body{max-width:100%;overflow-x:hidden}
+.listingPage,.catalog,.grid,.skeletonGrid{min-width:0;max-width:100%}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid>*{min-width:0;max-width:100%}
+.cardLink,.card,.cardBody{min-width:0;max-width:100%}
+.card h3,.synopsis,.broadcast{max-width:100%;overflow:hidden}
+.meta{min-width:0;max-width:100%}
+.meta span{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filterBar{min-width:0;max-width:100%}
+.filterSearch{min-width:0;max-width:100%}
+.filterSearch input{min-width:0;max-width:100%}
+.sectionHead{min-width:0;max-width:100%}
+@media(max-width:1100px){.grid,.skeletonGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.grid,.skeletonGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sectionHead{flex-wrap:wrap}.sectionHead>div{min-width:0;flex:1}.textLink{flex:0 0 auto}.filterSearch{flex-basis:100%;width:100%}}
+@media(max-width:560px){.grid,.skeletonGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.cardBody{padding:11px}.card h3{font-size:14px}.synopsis{font-size:10px}.meta{font-size:9px;gap:5px}.meta span:first-child{min-width:0}.poster{height:230px}}
