@@ -3,21 +3,20 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, CalendarDays, Clock3, Film, Globe2, Play, Star, Tv, Users } from 'lucide-react';
+import SiteNav from '../../../components/SiteNav';
 
 type Detail = { id:number; title:string; originalTitle:string; image:string; bannerImage:string; score:number|null; popularity:number|null; episodes:number|null; duration:string|null; status:string; format:string; country:string; releaseDate:string|null; endDate:string|null; season:string|null; seasonYear:number|null; synopsis:string; genres:string[]; studios:string[]; tags:string[]; broadcast:string|null; trailer:string|null; source:string };
-
 function prettyDate(value:string|null){ if(!value) return 'TBA'; return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(new Date(value)); }
 function titleCase(value:string|null){ return value ? value.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()) : '—'; }
-
 export default function AnimeOverview({ params }: { params: Promise<{ id:string }> }) {
  const [anime,setAnime]=useState<Detail|null>(null); const [error,setError]=useState(''); const [loading,setLoading]=useState(true);
  useEffect(()=>{ params.then(({id})=>fetch(`/api/anime/${id}`,{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);setAnime(d)}).catch(e=>setError(e.message||'Unable to load anime.')).finally(()=>setLoading(false))) },[params]);
- if(loading) return <main className="detailPage"><div className="detailSkeleton"/></main>;
- if(error||!anime) return <main className="detailPage"><Link href="/" className="backLink"><ArrowLeft size={15}/> Back home</Link><div className="error detailError">{error||'Anime not found.'}<Link href="/latest">Browse latest anime</Link></div></main>;
+ if(loading) return <main className="detailPage"><SiteNav/><div className="detailSkeleton"/></main>;
+ if(error||!anime) return <main className="detailPage"><SiteNav/><Link href="/" className="backLink"><ArrowLeft size={15}/> Back home</Link><div className="error detailError">{error||'Anime not found.'}<Link href="/latest">Browse latest anime</Link></div></main>;
  return <main className="detailPage">
+   <SiteNav/>
    <div className="detailBanner" style={{backgroundImage:`linear-gradient(90deg,#08090d 5%,#08090ddd 48%,#08090d88),url(${anime.bannerImage||anime.image})`}}/>
    <div className="detailShell">
-    <div className="detailNav"><Link href="/" className="backLink"><ArrowLeft size={15}/> Home</Link><Link href="/latest" className="backLink">Latest</Link><Link href="/upcoming" className="backLink">Upcoming</Link></div>
     <section className="detailHero">
       <div className="detailPoster"><img src={anime.image} alt={anime.title}/></div>
       <div className="detailIntro">
@@ -33,5 +32,5 @@ export default function AnimeOverview({ params }: { params: Promise<{ id:string 
       <aside className="facts"><span className="kicker">DETAILS</span><div className="fact"><CalendarDays/><div><small>Release date</small><b>{prettyDate(anime.releaseDate)}</b></div></div><div className="fact"><CalendarDays/><div><small>End date</small><b>{prettyDate(anime.endDate)}</b></div></div><div className="fact"><Film/><div><small>Season</small><b>{titleCase(anime.season)} {anime.seasonYear||''}</b></div></div><div className="fact"><Globe2/><div><small>Origin</small><b>{anime.country}</b></div></div><div className="fact"><Users/><div><small>Studio</small><b>{anime.studios.length?anime.studios.join(', '):'Not listed'}</b></div></div>{anime.broadcast&&<div className="broadcast bigBroadcast"><Clock3 size={15}/>{anime.broadcast}</div>}<small className="dataSource">Data via {anime.source}</small></aside>
     </section>
    </div>
- </main>
+ </main>;
 }
